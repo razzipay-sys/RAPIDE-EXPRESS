@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Users\\\\Anonimous\\\\RAPIDE-EXPRESS\")",
+      "Bash(pnpm --version)",
+      "Bash(npx turbo *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Anonimous\\\\RAPIDE-EXPRESS\\\\apps\\\\web\\\\src\\\\app\" -Recurse -Filter \"page.tsx\")",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}

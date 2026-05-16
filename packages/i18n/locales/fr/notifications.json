@@ -1,0 +1,22 @@
+{
+  "riderAssigned": "Votre coursier est en route",
+  "riderAssignedBody": "{riderName} a accepté votre livraison et se dirige vers vous.",
+  "pickedUp": "Colis collecté",
+  "pickedUpBody": "Votre colis a été collecté par {riderName}.",
+  "delivered": "Livraison effectuée",
+  "deliveredBody": "Votre colis a été livré avec succès. Évaluez votre expérience !",
+  "failed": "Échec de livraison",
+  "failedBody": "La livraison a échoué. {reason}",
+  "cancelled": "Livraison annulée",
+  "cancelledBody": "Votre livraison a été annulée.",
+  "topUpSuccess": "Recharge confirmée",
+  "topUpSuccessBody": "{amount} ajoutés à votre portefeuille.",
+  "payoutSuccess": "Retrait effectué",
+  "payoutSuccessBody": "{amount} envoyés sur votre compte.",
+  "promoAvailable": "Nouvelle promo disponible !",
+  "promoAvailableBody": "Utilisez le code {code} pour {discount} de réduction.",
+  "newDeliveryRequest": "Nouvelle livraison !",
+  "newDeliveryRequestBody": "Livraison à {distance} km - {fare}",
+  "earningPaid": "Gains crédités",
+  "earningPaidBody": "{amount} crédités sur votre portefeuille."
+}

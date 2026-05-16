@@ -1,0 +1,720 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_DATABASE_URL")
+  extensions = [postgis(version: "3.3.2"), uuid_ossp(map: "uuid-ossp"), pg_trgm]
+}
+
+// ============================================================
+// IDENTITY & AUTH
+// ============================================================
+
+model User {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  supabaseId   String   @unique @map("supabase_id") @db.Uuid
+  phone        String?  @unique
+  email        String?  @unique
+  fullName     String?  @map("full_name")
+  avatarUrl    String?  @map("avatar_url")
+  isVerified   Boolean  @default(false) @map("is_verified")
+  isActive     Boolean  @default(true) @map("is_active")
+  isBanned     Boolean  @default(false) @map("is_banned")
+  banReason    String?  @map("ban_reason")
+  referralCode String   @unique @map("referral_code")
+  referredById String?  @map("referred_by_id") @db.Uuid
+  language     String   @default("fr")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile        UserProfile?
+  addresses      UserAddress[]
+  devices        UserDevice[]
+  deliveries     Delivery[]      @relation("CustomerDeliveries")
+  wallet         Wallet?         @relation("UserWallet")
+  notifications  Notification[]
+  supportTickets SupportTicket[]
+  referredBy     User?           @relation("Referrals", fields: [referredById], references: [id])
+  referrals      User[]          @relation("Referrals")
+
+  @@index([phone])
+  @@index([email])
+  @@map("users")
+}
+
+model UserProfile {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String    @unique @map("user_id") @db.Uuid
+  dateOfBirth DateTime? @map("date_of_birth") @db.Date
+  gender      String?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserAddress {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  label       String
+  fullAddress String   @map("full_address")
+  latitude    Decimal  @db.Decimal(10, 8)
+  longitude   Decimal  @db.Decimal(11, 8)
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_addresses")
+}
+
+model UserDevice {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  deviceId   String   @map("device_id")
+  platform   String
+  pushToken  String?  @map("push_token")
+  isActive   Boolean  @default(true) @map("is_active")
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@map("user_devices")
+}
+
+// ============================================================
+// RIDER SYSTEM
+// ============================================================
+
+model Rider {
+  id             String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String      @unique @map("user_id") @db.Uuid
+  status         RiderStatus @default(PENDING_REVIEW)
+  onlineStatus   String      @default("offline") @map("online_status")
+  vehicleType    VehicleType @map("vehicle_type")
+  vehiclePlate   String      @map("vehicle_plate")
+  vehicleMake    String?     @map("vehicle_make")
+  vehicleModel   String?     @map("vehicle_model")
+  vehicleYear    Int?        @map("vehicle_year")
+  rating         Decimal     @default(5.0) @db.Decimal(3, 2)
+  totalDeliveries Int        @default(0) @map("total_deliveries")
+  acceptanceRate  Decimal    @default(1.0) @db.Decimal(5, 4) @map("acceptance_rate")
+  completionRate  Decimal    @default(1.0) @db.Decimal(5, 4) @map("completion_rate")
+  level           Int        @default(1)
+  xpPoints        Int        @default(0) @map("xp_points")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  documents       RiderDocument[]
+  locationHistory RiderLocationHistory[]
+  deliveries      Delivery[]            @relation("RiderDeliveries")
+  wallet          Wallet?               @relation("RiderWallet")
+  stats           RiderStats?
+  dispatchRequests DispatchRequest[]
+
+  @@index([status, onlineStatus])
+  @@map("riders")
+}
+
+model RiderDocument {
+  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  riderId      String      @map("rider_id") @db.Uuid
+  documentType DocumentType @map("document_type")
+  fileUrl      String      @map("file_url")
+  status       KycStatus   @default(PENDING)
+  reviewedBy   String?     @map("reviewed_by") @db.Uuid
+  reviewedAt   DateTime?   @map("reviewed_at")
+  rejectReason String?     @map("reject_reason")
+  expiresAt    DateTime?   @map("expires_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@index([riderId, status])
+  @@map("rider_documents")
+}
+
+model RiderLocationHistory {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  riderId   String   @map("rider_id") @db.Uuid
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  accuracy  Float?
+  heading   Float?
+  speed     Float?
+  timestamp DateTime @default(now())
+
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@index([riderId, timestamp(sort: Desc)])
+  @@map("rider_location_history")
+}
+
+model RiderStats {
+  id                 String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  riderId            String   @unique @map("rider_id") @db.Uuid
+  totalEarnings      Decimal  @default(0) @db.Decimal(12, 2) @map("total_earnings")
+  todayEarnings      Decimal  @default(0) @db.Decimal(12, 2) @map("today_earnings")
+  weekEarnings       Decimal  @default(0) @db.Decimal(12, 2) @map("week_earnings")
+  totalOnlineMinutes Int      @default(0) @map("total_online_minutes")
+  avgRating          Decimal  @default(5.0) @db.Decimal(3, 2) @map("avg_rating")
+  lastUpdated        DateTime @default(now()) @map("last_updated")
+
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+
+  @@map("rider_stats")
+}
+
+// ============================================================
+// DELIVERY SYSTEM
+// ============================================================
+
+model Delivery {
+  id            String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  trackingCode  String         @unique @map("tracking_code")
+  status        DeliveryStatus @default(PENDING)
+  customerId    String         @map("customer_id") @db.Uuid
+  riderId       String?        @map("rider_id") @db.Uuid
+  merchantId    String?        @map("merchant_id") @db.Uuid
+
+  pickupAddress      String  @map("pickup_address")
+  pickupLat          Decimal @db.Decimal(10, 8) @map("pickup_lat")
+  pickupLng          Decimal @db.Decimal(11, 8) @map("pickup_lng")
+  pickupContactName  String? @map("pickup_contact_name")
+  pickupContactPhone String? @map("pickup_contact_phone")
+
+  dropoffAddress String  @map("dropoff_address")
+  dropoffLat     Decimal @db.Decimal(10, 8) @map("dropoff_lat")
+  dropoffLng     Decimal @db.Decimal(11, 8) @map("dropoff_lng")
+  recipientName  String? @map("recipient_name")
+  recipientPhone String  @map("recipient_phone")
+
+  parcelCategory ParcelCategory @map("parcel_category")
+  weightKg       Decimal?       @db.Decimal(8, 3) @map("weight_kg")
+  lengthCm       Decimal?       @db.Decimal(8, 2) @map("length_cm")
+  widthCm        Decimal?       @db.Decimal(8, 2) @map("width_cm")
+  heightCm       Decimal?       @db.Decimal(8, 2) @map("height_cm")
+  parcelImageUrl String?        @map("parcel_image_url")
+  deliveryNotes  String?        @map("delivery_notes")
+
+  distanceKm      Decimal @db.Decimal(8, 3) @map("distance_km")
+  baseFare        Decimal @db.Decimal(10, 2) @map("base_fare")
+  distanceFare    Decimal @db.Decimal(10, 2) @map("distance_fare")
+  surgeMultiplier Decimal @default(1.0) @db.Decimal(5, 4) @map("surge_multiplier")
+  priorityPremium Decimal @default(0) @db.Decimal(10, 2) @map("priority_premium")
+  insuranceFee    Decimal @default(0) @db.Decimal(10, 2) @map("insurance_fee")
+  totalFare       Decimal @db.Decimal(10, 2) @map("total_fare")
+  platformFee     Decimal @db.Decimal(10, 2) @map("platform_fee")
+  riderEarning    Decimal @db.Decimal(10, 2) @map("rider_earning")
+
+  isPriority     Boolean       @default(false) @map("is_priority")
+  isInsured      Boolean       @default(false) @map("is_insured")
+  isScheduled    Boolean       @default(false) @map("is_scheduled")
+  scheduledFor   DateTime?     @map("scheduled_for")
+  paymentMethod  PaymentMethod @map("payment_method")
+  paymentStatus  String        @default("pending") @map("payment_status")
+
+  deliveryOtp       String? @map("delivery_otp")
+  proofPhotoUrl     String? @map("proof_photo_url")
+  proofSignatureUrl String? @map("proof_signature_url")
+
+  assignedAt    DateTime? @map("assigned_at")
+  pickedUpAt    DateTime? @map("picked_up_at")
+  deliveredAt   DateTime? @map("delivered_at")
+  cancelledAt   DateTime? @map("cancelled_at")
+  failureReason String?   @map("failure_reason")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  customer         User              @relation("CustomerDeliveries", fields: [customerId], references: [id])
+  rider            Rider?            @relation("RiderDeliveries", fields: [riderId], references: [id])
+  merchant         Merchant?         @relation(fields: [merchantId], references: [id])
+  stops            DeliveryStop[]
+  timeline         DeliveryTimeline[]
+  dispatchRequests DispatchRequest[]
+  transaction      Transaction?
+
+  @@index([customerId])
+  @@index([riderId])
+  @@index([status])
+  @@index([trackingCode])
+  @@index([createdAt(sort: Desc)])
+  @@map("deliveries")
+}
+
+model DeliveryStop {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  deliveryId   String    @map("delivery_id") @db.Uuid
+  sequence     Int
+  address      String
+  latitude     Decimal   @db.Decimal(10, 8)
+  longitude    Decimal   @db.Decimal(11, 8)
+  contactName  String?   @map("contact_name")
+  contactPhone String?   @map("contact_phone")
+  notes        String?
+  arrivedAt    DateTime? @map("arrived_at")
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@map("delivery_stops")
+}
+
+model DeliveryTimeline {
+  id         String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  deliveryId String         @map("delivery_id") @db.Uuid
+  status     DeliveryStatus
+  description String?
+  latitude   Decimal?       @db.Decimal(10, 8)
+  longitude  Decimal?       @db.Decimal(11, 8)
+  actorId    String?        @map("actor_id") @db.Uuid
+  actorType  String?        @map("actor_type")
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId, createdAt(sort: Desc)])
+  @@map("delivery_timeline")
+}
+
+// ============================================================
+// DISPATCH SYSTEM
+// ============================================================
+
+model DispatchRequest {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  deliveryId   String    @map("delivery_id") @db.Uuid
+  riderId      String    @map("rider_id") @db.Uuid
+  status       String    @default("pending")
+  sentAt       DateTime  @default(now()) @map("sent_at")
+  respondedAt  DateTime? @map("responded_at")
+  expiresAt    DateTime  @map("expires_at")
+  rejectReason String?   @map("reject_reason")
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id])
+  rider    Rider    @relation(fields: [riderId], references: [id])
+
+  @@index([deliveryId])
+  @@index([riderId, status])
+  @@map("dispatch_requests")
+}
+
+// ============================================================
+// FINANCIAL SYSTEM
+// ============================================================
+
+model Wallet {
+  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  ownerId   String     @db.Uuid @map("owner_id")
+  ownerType WalletType @map("owner_type")
+  balance   Decimal    @default(0) @db.Decimal(14, 2)
+  currency  String     @default("XOF")
+  isActive  Boolean    @default(true) @map("is_active")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  userOwner     User?         @relation("UserWallet", fields: [ownerId], references: [id])
+  riderOwner    Rider?        @relation("RiderWallet", fields: [ownerId], references: [id])
+  merchantOwner Merchant?     @relation("MerchantWallet", fields: [ownerId], references: [id])
+  transactions  Transaction[]
+  payouts       Payout[]
+
+  @@unique([ownerId, ownerType])
+  @@map("wallets")
+}
+
+model Transaction {
+  id            String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  walletId      String          @map("wallet_id") @db.Uuid
+  deliveryId    String?         @unique @map("delivery_id") @db.Uuid
+  type          TransactionType
+  amount        Decimal         @db.Decimal(14, 2)
+  balanceBefore Decimal         @db.Decimal(14, 2) @map("balance_before")
+  balanceAfter  Decimal         @db.Decimal(14, 2) @map("balance_after")
+  currency      String          @default("XOF")
+  description   String?
+  reference     String?         @unique
+  externalRef   String?         @map("external_ref")
+  providerName  String?         @map("provider_name")
+  status        String          @default("completed")
+  metadata      Json?
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  wallet   Wallet   @relation(fields: [walletId], references: [id])
+  delivery Delivery? @relation(fields: [deliveryId], references: [id])
+
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([reference])
+  @@map("transactions")
+}
+
+model Payout {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  walletId    String    @map("wallet_id") @db.Uuid
+  amount      Decimal   @db.Decimal(14, 2)
+  method      String
+  accountRef  String    @map("account_ref")
+  status      String    @default("pending")
+  processedAt DateTime? @map("processed_at")
+  failReason  String?   @map("fail_reason")
+  externalRef String?   @map("external_ref")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("payouts")
+}
+
+model Coupon {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code          String    @unique
+  discountType  String    @map("discount_type")
+  discountValue Decimal   @db.Decimal(10, 2) @map("discount_value")
+  minOrderValue Decimal?  @db.Decimal(10, 2) @map("min_order_value")
+  maxDiscount   Decimal?  @db.Decimal(10, 2) @map("max_discount")
+  maxUses       Int?      @map("max_uses")
+  usedCount     Int       @default(0) @map("used_count")
+  isActive      Boolean   @default(true) @map("is_active")
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  usages CouponUsage[]
+
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  couponId   String   @map("coupon_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  deliveryId String   @map("delivery_id") @db.Uuid
+  usedAt     DateTime @default(now()) @map("used_at")
+
+  coupon Coupon @relation(fields: [couponId], references: [id])
+
+  @@unique([couponId, userId, deliveryId])
+  @@map("coupon_usages")
+}
+
+// ============================================================
+// PRICING SYSTEM
+// ============================================================
+
+model PricingZone {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String
+  slug      String   @unique
+  baseFare  Decimal  @db.Decimal(10, 2) @map("base_fare")
+  perKmRate Decimal  @db.Decimal(10, 4) @map("per_km_rate")
+  minFare   Decimal  @db.Decimal(10, 2) @map("min_fare")
+  currency  String   @default("XOF")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  rules PricingRule[]
+
+  @@map("pricing_zones")
+}
+
+model PricingRule {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  zoneId    String   @map("zone_id") @db.Uuid
+  ruleType  String   @map("rule_type")
+  condition Json
+  multiplier Decimal? @db.Decimal(5, 4)
+  addedFee  Decimal? @db.Decimal(10, 2) @map("added_fee")
+  priority  Int      @default(0)
+  isActive  Boolean  @default(true) @map("is_active")
+
+  zone PricingZone @relation(fields: [zoneId], references: [id])
+
+  @@index([zoneId, isActive])
+  @@map("pricing_rules")
+}
+
+// ============================================================
+// MERCHANT SYSTEM
+// ============================================================
+
+model Merchant {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  ownerId        String   @map("owner_id") @db.Uuid
+  businessName   String   @map("business_name")
+  businessType   String   @map("business_type")
+  logoUrl        String?  @map("logo_url")
+  isVerified     Boolean  @default(false) @map("is_verified")
+  isActive       Boolean  @default(true) @map("is_active")
+  commissionRate Decimal  @default(0.15) @db.Decimal(5, 4) @map("commission_rate")
+  creditLimit    Decimal  @default(0) @db.Decimal(12, 2) @map("credit_limit")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  members    MerchantMember[]
+  apiKeys    MerchantApiKey[]
+  deliveries Delivery[]
+  wallet     Wallet?          @relation("MerchantWallet")
+
+  @@map("merchants")
+}
+
+model MerchantMember {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  merchantId String   @map("merchant_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  role       String   @default("member")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, userId])
+  @@map("merchant_members")
+}
+
+model MerchantApiKey {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  merchantId  String    @map("merchant_id") @db.Uuid
+  name        String
+  keyHash     String    @map("key_hash")
+  prefix      String
+  permissions String[]
+  lastUsedAt  DateTime? @map("last_used_at")
+  expiresAt   DateTime? @map("expires_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  merchant Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@map("merchant_api_keys")
+}
+
+// ============================================================
+// SUPPORT SYSTEM
+// ============================================================
+
+model SupportTicket {
+  id         String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  deliveryId String?        @map("delivery_id") @db.Uuid
+  subject    String
+  category   String
+  status     TicketStatus   @default(OPEN)
+  priority   TicketPriority @default(MEDIUM)
+  assignedTo String?        @map("assigned_to") @db.Uuid
+  resolvedAt DateTime?      @map("resolved_at")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  user     User             @relation(fields: [userId], references: [id])
+  messages SupportMessage[]
+
+  @@index([status, priority])
+  @@index([userId])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  ticketId    String   @map("ticket_id") @db.Uuid
+  senderId    String   @map("sender_id") @db.Uuid
+  senderType  String   @map("sender_type")
+  content     String
+  attachments String[] @default([])
+  isInternal  Boolean  @default(false) @map("is_internal")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt(sort: Asc)])
+  @@map("support_messages")
+}
+
+// ============================================================
+// NOTIFICATION SYSTEM
+// ============================================================
+
+model Notification {
+  id        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String
+  data      Json?
+  isRead    Boolean   @default(false) @map("is_read")
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// ============================================================
+// ADMIN SYSTEM
+// ============================================================
+
+model AdminUser {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  supabaseId  String    @unique @map("supabase_id") @db.Uuid
+  email       String    @unique
+  fullName    String    @map("full_name")
+  role        AdminRole @default(SUPPORT_AGENT)
+  permissions String[]  @default([])
+  isActive    Boolean   @default(true) @map("is_active")
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  auditLogs AuditLog[]
+
+  @@map("admin_users")
+}
+
+model AuditLog {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  adminId      String    @map("admin_id") @db.Uuid
+  action       String
+  resourceType String    @map("resource_type")
+  resourceId   String    @map("resource_id")
+  before       Json?
+  after        Json?
+  ipAddress    String?   @map("ip_address")
+  userAgent    String?   @map("user_agent")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  admin AdminUser @relation(fields: [adminId], references: [id])
+
+  @@index([adminId, createdAt(sort: Desc)])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
+
+// ============================================================
+// GEOGRAPHIC SYSTEM
+// ============================================================
+
+model ServiceZone {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String
+  cityName  String   @map("city_name")
+  country   String   @default("BJ")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("service_zones")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum DeliveryStatus {
+  DRAFT
+  PENDING
+  ASSIGNED
+  RIDER_EN_ROUTE_PICKUP
+  AT_PICKUP
+  PICKED_UP
+  IN_TRANSIT
+  AT_DROPOFF
+  DELIVERED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum ParcelCategory {
+  DOCUMENTS
+  ELECTRONICS
+  FOOD
+  CLOTHING
+  MEDICINE
+  FRAGILE
+  CASH
+  OTHER
+}
+
+enum RiderStatus {
+  PENDING_REVIEW
+  DOCUMENTS_REQUIRED
+  UNDER_REVIEW
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  BICYCLE
+  CAR
+  VAN
+  TRUCK
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  DRIVERS_LICENSE
+  VEHICLE_REGISTRATION
+  INSURANCE
+  PROFILE_PHOTO
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum WalletType {
+  USER
+  RIDER
+  MERCHANT
+}
+
+enum TransactionType {
+  DELIVERY_PAYMENT
+  WALLET_TOPUP
+  RIDER_EARNING
+  PLATFORM_FEE
+  PAYOUT
+  REFUND
+  REFERRAL_BONUS
+  PROMO_CREDIT
+}
+
+enum PaymentMethod {
+  WALLET
+  CARD
+  MOBILE_MONEY
+  CASH_ON_DELIVERY
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  OPS_ADMIN
+  FINANCE_ADMIN
+  SUPPORT_AGENT
+  VIEWER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}

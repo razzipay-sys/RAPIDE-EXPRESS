@@ -1,0 +1,103 @@
+{
+  "sendPackage": "Send package",
+  "trackOrder": "Track order",
+  "scheduleDelivery": "Schedule delivery",
+  "expressDelivery": "Express delivery",
+  "businessDelivery": "Business delivery",
+
+  "createDelivery": "Create delivery",
+  "pickupAddress": "Pickup address",
+  "dropoffAddress": "Dropoff address",
+  "pickupPlaceholder": "Where is the package from?",
+  "dropoffPlaceholder": "Where to deliver?",
+  "addStop": "Add stop",
+  "removeStop": "Remove stop",
+  "multiStop": "Multi-stop delivery",
+
+  "parcelDetails": "Parcel details",
+  "parcelCategory": "Category",
+  "parcelWeight": "Weight (kg)",
+  "parcelDimensions": "Dimensions (cm)",
+  "parcelImage": "Parcel photo",
+  "parcelNotes": "Special instructions",
+  "parcelNotesPlaceholder": "e.g. Fragile, call before delivery...",
+
+  "recipientName": "Recipient name",
+  "recipientPhone": "Recipient phone",
+
+  "deliveryOptions": "Delivery options",
+  "priorityDelivery": "Priority delivery",
+  "priorityDescription": "Delivered with priority, +30%",
+  "insurance": "Parcel insurance",
+  "insuranceDescription": "Coverage up to 500,000 XOF",
+  "scheduleTime": "Schedule for later",
+
+  "priceEstimate": "Price estimate",
+  "baseFare": "Base fare",
+  "distanceFare": "Distance fare",
+  "surgeMultiplier": "Surge multiplier",
+  "priorityPremium": "Priority premium",
+  "insuranceFee": "Insurance fee",
+  "totalFare": "Total",
+  "estimatedTime": "Estimated time",
+  "distanceKm": "{distance} km",
+
+  "paymentMethod": "Payment method",
+  "payByWallet": "Pay with wallet",
+  "payByCard": "Pay by card",
+  "payByMobileMoney": "Mobile Money",
+  "payOnDelivery": "Pay on delivery",
+  "walletBalance": "Balance: {balance}",
+  "insufficientBalance": "Insufficient balance",
+
+  "confirmDelivery": "Confirm delivery",
+  "bookingSuccess": "Delivery confirmed!",
+  "trackingCode": "Tracking code: {code}",
+
+  "trackDelivery": "Live tracking",
+  "riderName": "Your rider",
+  "riderRating": "{rating} ★",
+  "callRider": "Call rider",
+  "chatRider": "Contact rider",
+  "eta": "Estimated arrival",
+  "etaValue": "In {minutes} min",
+
+  "status": {
+    "DRAFT": "Draft",
+    "PENDING": "Pending",
+    "ASSIGNED": "Rider assigned",
+    "RIDER_EN_ROUTE_PICKUP": "En route to pickup",
+    "AT_PICKUP": "At pickup",
+    "PICKED_UP": "Package picked up",
+    "IN_TRANSIT": "In transit",
+    "AT_DROPOFF": "At dropoff",
+    "DELIVERED": "Delivered",
+    "FAILED": "Failed",
+    "CANCELLED": "Cancelled",
+    "REFUNDED": "Refunded"
+  },
+
+  "category": {
+    "DOCUMENTS": "Documents",
+    "ELECTRONICS": "Electronics",
+    "FOOD": "Food",
+    "CLOTHING": "Clothing",
+    "MEDICINE": "Medicine",
+    "FRAGILE": "Fragile",
+    "CASH": "Cash",
+    "OTHER": "Other"
+  },
+
+  "deliveryOtp": "Delivery code",
+  "otpInstruction": "Give this code to the rider to confirm delivery",
+  "confirmDeliveryOtp": "Confirm delivery",
+  "proofOfDelivery": "Proof of delivery",
+
+  "cancelDelivery": "Cancel delivery",
+  "cancelReason": "Cancellation reason",
+  "cancellationFee": "Cancellation fees may apply",
+
+  "reportIssue": "Report an issue",
+  "rateDelivery": "Rate delivery",
+  "leaveReview": "Leave a review"
+}

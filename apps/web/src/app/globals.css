@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Orange design tokens — same in both modes */
+    --color-orange: #FF6B00;
+    --color-orange-light: #FF8C3A;
+    --color-orange-dark: #E55A00;
+    --color-orange-muted: rgba(255, 107, 0, 0.10);
+    --color-orange-border: rgba(255, 107, 0, 0.20);
+
+    /* Dark mode (default) */
+    --color-bg: #09090E;
+    --color-bg-surface: #111118;
+    --color-bg-elevated: #18181F;
+    --color-bg-overlay: #1F1F2A;
+    --color-text: #FFFFFF;
+    --color-text-secondary: rgba(255, 255, 255, 0.55);
+    --color-text-tertiary: rgba(255, 255, 255, 0.30);
+    --color-border: rgba(255, 255, 255, 0.07);
+    --color-border-strong: rgba(255, 255, 255, 0.14);
+  }
+
+  /* Light mode */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --color-bg: #FAFAFA;
+      --color-bg-surface: #FFFFFF;
+      --color-bg-elevated: #F4F4F6;
+      --color-bg-overlay: #ECECF0;
+      --color-text: #0A0A0F;
+      --color-text-secondary: rgba(10, 10, 15, 0.55);
+      --color-text-tertiary: rgba(10, 10, 15, 0.30);
+      --color-border: rgba(0, 0, 0, 0.07);
+      --color-border-strong: rgba(0, 0, 0, 0.14);
+    }
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+  }
+
+  ::selection {
+    background-color: rgba(255, 107, 0, 0.25);
+    color: var(--color-text);
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--color-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 99px; }
+}
+
+@layer utilities {
+  /* Glassmorphism — adapts to light/dark */
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--color-border);
+  }
+
+  @media (prefers-color-scheme: light) {
+    .glass {
+      background: rgba(255, 255, 255, 0.70);
+      border-color: var(--color-border);
+    }
+  }
+
+  /* Orange gradient text — primary brand moment */
+  .gradient-text {
+    background: linear-gradient(120deg, var(--color-orange) 0%, var(--color-orange-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Orange noise grain texture overlay */
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Glow utilities */
+  .glow-orange { box-shadow: 0 0 60px rgba(255, 107, 0, 0.18); }
+  .glow-orange-sm { box-shadow: 0 0 30px rgba(255, 107, 0, 0.12); }
+}

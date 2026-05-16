@@ -1,0 +1,22 @@
+{
+  "riderAssigned": "Your rider is on the way",
+  "riderAssignedBody": "{riderName} accepted your delivery and is heading to you.",
+  "pickedUp": "Package picked up",
+  "pickedUpBody": "Your package was collected by {riderName}.",
+  "delivered": "Delivery completed",
+  "deliveredBody": "Your package has been delivered successfully. Rate your experience!",
+  "failed": "Delivery failed",
+  "failedBody": "Delivery failed. {reason}",
+  "cancelled": "Delivery cancelled",
+  "cancelledBody": "Your delivery has been cancelled.",
+  "topUpSuccess": "Top-up confirmed",
+  "topUpSuccessBody": "{amount} added to your wallet.",
+  "payoutSuccess": "Withdrawal processed",
+  "payoutSuccessBody": "{amount} sent to your account.",
+  "promoAvailable": "New promo available!",
+  "promoAvailableBody": "Use code {code} for {discount} off.",
+  "newDeliveryRequest": "New delivery!",
+  "newDeliveryRequestBody": "Delivery {distance} km away — {fare}",
+  "earningPaid": "Earnings credited",
+  "earningPaidBody": "{amount} credited to your wallet."
+}

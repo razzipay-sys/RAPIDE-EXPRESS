@@ -1,0 +1,18 @@
+{
+  "extends": "@rapide/config/typescript/next",
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "../../packages/config/typescript/next-env.d.ts",
+    "../../packages/config/typescript/**/*.ts",
+    "../../packages/config/typescript/**/*.tsx",
+    "../../packages/config/typescript/.next/types/**/*.ts",
+    ".next/types/**/*.ts"
+  ]
+}

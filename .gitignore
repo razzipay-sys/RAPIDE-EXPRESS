@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+out
+build
+
+# Turbo
+.turbo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea
+*.swp
+*.swo
+
+# Testing
+coverage
+playwright-report
+test-results
+
+# Prisma
+*.db
+*.db-journal
+
+# Logs
+*.log
+logs
+
+# Vercel
+.vercel
+
+# Sentry
+.sentryclirc
+
+# Flutter
+apps/mobile/.dart_tool
+apps/mobile/build
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/pubspec.lock
+
+# Supabase
+supabase/.branches
+supabase/.temp

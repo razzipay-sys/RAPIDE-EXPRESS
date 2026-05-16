@@ -1,0 +1,22 @@
+{
+  "generic": "Une erreur est survenue. Réessayez.",
+  "network": "Erreur de connexion. Vérifiez votre réseau.",
+  "unauthorized": "Vous n'êtes pas connecté.",
+  "forbidden": "Action non autorisée.",
+  "notFound": "Ressource introuvable.",
+  "validation": "Données invalides. Vérifiez le formulaire.",
+  "serverError": "Erreur serveur. Réessayez plus tard.",
+  "timeout": "La requête a expiré. Réessayez.",
+  "insufficientBalance": "Solde insuffisant.",
+  "deliveryNotFound": "Livraison introuvable.",
+  "riderNotAvailable": "Aucun coursier disponible. Réessayez dans quelques minutes.",
+  "addressNotFound": "Adresse non trouvée dans notre zone de couverture.",
+  "invalidPhone": "Numéro de téléphone invalide.",
+  "invalidOtp": "Code de vérification incorrect.",
+  "otpExpired": "Code expiré. Demandez-en un nouveau.",
+  "couponInvalid": "Code promo invalide ou expiré.",
+  "outsideZone": "Adresse hors de notre zone de livraison.",
+  "riderOffline": "Le coursier est hors ligne.",
+  "sessionExpired": "Session expirée. Reconnectez-vous.",
+  "tooManyRequests": "Trop de tentatives. Attendez avant de réessayer."
+}

@@ -1,0 +1,103 @@
+{
+  "sendPackage": "Envoyer un colis",
+  "trackOrder": "Suivre ma commande",
+  "scheduleDelivery": "Planifier une livraison",
+  "expressDelivery": "Livraison express",
+  "businessDelivery": "Livraison pro",
+
+  "createDelivery": "Créer une livraison",
+  "pickupAddress": "Adresse de collecte",
+  "dropoffAddress": "Adresse de livraison",
+  "pickupPlaceholder": "D'où part le colis ?",
+  "dropoffPlaceholder": "Où livrer le colis ?",
+  "addStop": "Ajouter une étape",
+  "removeStop": "Supprimer l'étape",
+  "multiStop": "Livraison multi-arrêts",
+
+  "parcelDetails": "Détails du colis",
+  "parcelCategory": "Catégorie",
+  "parcelWeight": "Poids (kg)",
+  "parcelDimensions": "Dimensions (cm)",
+  "parcelImage": "Photo du colis",
+  "parcelNotes": "Instructions spéciales",
+  "parcelNotesPlaceholder": "Ex: Fragile, appeler avant de livrer...",
+
+  "recipientName": "Nom du destinataire",
+  "recipientPhone": "Téléphone du destinataire",
+
+  "deliveryOptions": "Options de livraison",
+  "priorityDelivery": "Livraison prioritaire",
+  "priorityDescription": "Livré en priorité, +30%",
+  "insurance": "Assurance colis",
+  "insuranceDescription": "Couverture jusqu'à 500 000 XOF",
+  "scheduleTime": "Programmer pour plus tard",
+
+  "priceEstimate": "Estimation du prix",
+  "baseFare": "Tarif de base",
+  "distanceFare": "Tarif kilométrique",
+  "surgeMultiplier": "Multiplicateur de pointe",
+  "priorityPremium": "Supplément prioritaire",
+  "insuranceFee": "Frais d'assurance",
+  "totalFare": "Total",
+  "estimatedTime": "Temps estimé",
+  "distanceKm": "{distance} km",
+
+  "paymentMethod": "Mode de paiement",
+  "payByWallet": "Payer avec le portefeuille",
+  "payByCard": "Payer par carte",
+  "payByMobileMoney": "Mobile Money",
+  "payOnDelivery": "Payer à la livraison",
+  "walletBalance": "Solde : {balance}",
+  "insufficientBalance": "Solde insuffisant",
+
+  "confirmDelivery": "Confirmer la livraison",
+  "bookingSuccess": "Livraison confirmée !",
+  "trackingCode": "Code de suivi : {code}",
+
+  "trackDelivery": "Suivi en temps réel",
+  "riderName": "Votre coursier",
+  "riderRating": "{rating} ★",
+  "callRider": "Appeler le coursier",
+  "chatRider": "Contacter le coursier",
+  "eta": "Arrivée estimée",
+  "etaValue": "Dans {minutes} min",
+
+  "status": {
+    "DRAFT": "Brouillon",
+    "PENDING": "En attente",
+    "ASSIGNED": "Coursier assigné",
+    "RIDER_EN_ROUTE_PICKUP": "En route vers la collecte",
+    "AT_PICKUP": "À la collecte",
+    "PICKED_UP": "Colis collecté",
+    "IN_TRANSIT": "En transit",
+    "AT_DROPOFF": "À destination",
+    "DELIVERED": "Livré",
+    "FAILED": "Échec de livraison",
+    "CANCELLED": "Annulé",
+    "REFUNDED": "Remboursé"
+  },
+
+  "category": {
+    "DOCUMENTS": "Documents",
+    "ELECTRONICS": "Électronique",
+    "FOOD": "Alimentation",
+    "CLOTHING": "Vêtements",
+    "MEDICINE": "Médicaments",
+    "FRAGILE": "Fragile",
+    "CASH": "Espèces",
+    "OTHER": "Autre"
+  },
+
+  "deliveryOtp": "Code de livraison",
+  "otpInstruction": "Donnez ce code au coursier pour confirmer la livraison",
+  "confirmDeliveryOtp": "Confirmer la livraison",
+  "proofOfDelivery": "Preuve de livraison",
+
+  "cancelDelivery": "Annuler la livraison",
+  "cancelReason": "Raison de l'annulation",
+  "cancellationFee": "Des frais d'annulation peuvent s'appliquer",
+
+  "reportIssue": "Signaler un problème",
+  "rateDelivery": "Évaluer la livraison",
+  "leaveReview": "Laisser un avis"
+}

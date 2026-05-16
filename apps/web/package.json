@@ -1,0 +1,45 @@
+{
+  "name": "@rapide/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
+    "@rapide/database": "workspace:*",
+    "@rapide/i18n": "workspace:*",
+    "@rapide/types": "workspace:*",
+    "@rapide/ui": "workspace:*",
+    "@rapide/utils": "workspace:*",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "framer-motion": "^11.15.0",
+    "lottie-react": "^2.4.0",
+    "mapbox-gl": "^3.9.4",
+    "next": "^16.2.6",
+    "next-intl": "^4.12.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-dropzone": "^14.3.5",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.172.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@rapide/config": "workspace:*",
+    "@types/mapbox-gl": "^3.4.1",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.172.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
+}
